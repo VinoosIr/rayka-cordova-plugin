@@ -1,0 +1,23 @@
+repositories{
+	google()
+	jcenter()
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+
+dependencies {
+	implementation 'com.squareup.okhttp3:okhttp:4.0.0'
+}
+
+android {
+	packagingOptions {
+		exclude 'META-INF/NOTICE'
+		exclude 'META-INF/LICENSE'
+	}
+}

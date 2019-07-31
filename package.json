@@ -1,0 +1,39 @@
+{
+  "name": "rayka-cordova-plugin",
+  "version": "4.0.0",
+  "description": "Rayka ad service plugin for cordova, phonegap and ionic",
+  "cordova": {
+    "id": "rayka-cordova-plugin",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinoosir/rayka-cordova-plugin.git"
+  },
+  "keywords": [
+    "cordova",
+    "plugin",
+    "ad",
+    "rayka",
+    "monetisation",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+"devDependencies": {
+    "cordova": ">=3.0.0"
+  },
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "Milad Mohammadi Rezagah",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vinoosir/rayka-cordova-plugin/issues"
+  },
+  "homepage": "https://github.com/vinoosir/rayka-cordova-plugin#readme"
+}

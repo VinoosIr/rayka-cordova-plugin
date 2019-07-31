@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="utf-8" />
+        <title>Rayka Sample</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+		<script type="text/javascript" src="cordova.js"></script>
+    </head>
+    <body>
+		<script>
+			document.addEventListener("deviceready", function () {
+				var parentElement = document.getElementById("deviceready");
+				var listeningElement = parentElement.querySelector('.listening');
+				var receivedElement = parentElement.querySelector('.received');
+
+				listeningElement.setAttribute('style', 'display:none;');
+				receivedElement.setAttribute('style', 'display:block;');
+				
+				/*** Popup Events ***/
+				window.rayka.onPopupClick = function () {
+					console.log('onPopupClick');
+				};
+				window.rayka.onPopupClose = function () {
+					console.log('onPopupClose');
+				};
+				window.rayka.onPopupFail = function () {
+					console.log('onPopupFail');
+				};
+				window.rayka.onPopupReady = function () {
+					console.log('onPopupReady');
+				};
+				window.rayka.onPopupRequest = function () {
+					console.log('onPopupRequest');
+				};
+				window.rayka.onPopupShow = function () {
+					console.log('onPopupShow');
+				};
+				
+				/*** Video Events ***/
+				window.rayka.onVideoClick = function () {
+					console.log('onVideoClick');
+				};
+				window.rayka.onVideoFail = function () {
+					console.log('onVideoFail');
+				};
+				window.rayka.onVideoReady = function () {
+					console.log('onVideoReady');
+				};
+				window.rayka.onVideoRequest = function () {
+					console.log('onVideoRequest');
+				};
+				
+				window.rayka.onVideoStart = function () {
+					console.log('onVideoStart');
+				};
+				window.rayka.onVideoComplete = function () {
+					console.log('onVideoComplete');
+				};
+				window.rayka.onVideoNotComplete = function () {
+					console.log('onVideoNotComplete');
+				};
+				
+				console.log('Device is Ready');
+			}, false);
+			
+			function random_position(min, max) {
+				return Math.floor(Math.random() * (max - min + 1) ) + min;
+			}
+		</script>
+        <div class="app">
+            <h1>Apache Cordova</h1>
+            <div id="deviceready" class="blink">
+                <p class="event listening">Connecting to Device</p>
+                <p class="event received">Device is Ready</p>
+            </div>
+			<button onclick='window.rayka.addBanner(window.rayka.Position.TOP, 0, 0);'>Show Banner at Top</button>
+			<button onclick='window.rayka.addBanner(window.rayka.Position.BOTTOM, 0, 0);'>Show Banner at Bottom</button>
+			<button onclick='window.rayka.addBanner(window.rayka.Position.XY, 0, random_position(0, 850));'>Show Banner at Random Position</button>
+			<button onclick="window.rayka.removeBanner();">Remove Banner</button>
+            <button onclick='window.rayka.cachePopup("");'>cachePopup</button>
+			<button onclick="window.rayka.showPopup();">showPopup</button>
+            <button onclick='window.rayka.cacheVideo("");'>cacheVideo</button>
+			<button onclick="window.rayka.showVideo();">showVideo</button>
+        </div>
+    </body>
+</html>

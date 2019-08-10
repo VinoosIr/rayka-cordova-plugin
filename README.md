@@ -33,9 +33,32 @@ you can add the banner at the TOP/BOTTOM/XY of your app.
 `windows.rayka.Position` holds  positions const.
 
 ```js
-window.rayka.addBanner(window.rayka.Position.BOTTOM, 0, 0);
-window.rayka.addBanner(window.rayka.Position.TOP, 0, 0);
-window.rayka.addBanner(window.rayka.Position.XY, 10, 50);
+window.rayka.addBanner("ZONE_ID", window.rayka.Position.BOTTOM, 0, 0);
+window.rayka.addBanner("ZONE_ID", window.rayka.Position.TOP, 0, 0);
+window.rayka.addBanner("ZONE_ID", window.rayka.Position.XY, 10, 50);
+```
+
+you can use this event:
+
+```js
+window.rayka.onBannerClick = function () {
+	alert('onBannerClick');
+};
+window.rayka.onBannerClose = function () {
+	alert('onBannerClose');
+};
+window.rayka.onBannerFail = function () {
+	alert('onBannerFail');
+};
+window.rayka.onBannerReady = function () {
+	alert('onBannerReady');
+};
+window.rayka.onBannerRequest = function () {
+	alert('onBannerRequest');
+};
+window.rayka.onBannerShow = function () {
+	alert('onBannerShow');
+};
 ```
 
 ### 2.Remove banner 

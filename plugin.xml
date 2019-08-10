@@ -8,8 +8,8 @@
     <author>Milad Mohammadi Rezagah</author>	
     <license>MIT</license>
     <keywords>cordova,plugin,ad,rayka,monetisation</keywords>
-    <repo>https://github.com/vinoosir/rayka-cordova-plugin</repo>
-    <issue>https://github.com/vinoosir/rayka-cordova-plugin/issues</issue>	
+    <repo>https://github.com/miladesign/rayka-cordova-plugin</repo>
+    <issue>https://github.com/miladesign/rayka-cordova-plugin/issues</issue>	
 	<engines>
 	    <engine name="cordova" version=">=3.0.0" />
 	</engines>
@@ -28,8 +28,9 @@
 		</config-file>
 		
 		<source-file src="libs/Rayka-4.0.0.jar" target-dir="libs" />
+		<source-file src="libs/okhttp-3.12.3.jar" target-dir="libs" />
+		<source-file src="libs/okio-1.15.0.jar" target-dir="libs" />
         <source-file src="src/Rayka.java" target-dir="src/com.raykaad" />
-        <framework src="src/build.gradle" custom="true" type="gradleReference" />
 
 		<config-file target="AndroidManifest.xml" parent="/*">
 			<uses-permission android:name="android.permission.INTERNET" />

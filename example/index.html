@@ -17,6 +17,26 @@
 				listeningElement.setAttribute('style', 'display:none;');
 				receivedElement.setAttribute('style', 'display:block;');
 				
+				/*** Banner Events ***/
+				window.rayka.onBannerClick = function () {
+					console.log('onBannerClick');
+				};
+				window.rayka.onBannerClose = function () {
+					console.log('onBannerClose');
+				};
+				window.rayka.onBannerFail = function () {
+					console.log('onBannerFail');
+				};
+				window.rayka.onBannerReady = function () {
+					console.log('onBannerReady');
+				};
+				window.rayka.onBannerRequest = function () {
+					console.log('onBannerRequest');
+				};
+				window.rayka.onBannerShow = function () {
+					console.log('onBannerShow');
+				};
+				
 				/*** Popup Events ***/
 				window.rayka.onPopupClick = function () {
 					console.log('onPopupClick');
@@ -74,9 +94,9 @@
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
             </div>
-			<button onclick='window.rayka.addBanner(window.rayka.Position.TOP, 0, 0);'>Show Banner at Top</button>
-			<button onclick='window.rayka.addBanner(window.rayka.Position.BOTTOM, 0, 0);'>Show Banner at Bottom</button>
-			<button onclick='window.rayka.addBanner(window.rayka.Position.XY, 0, random_position(0, 850));'>Show Banner at Random Position</button>
+			<button onclick='window.rayka.addBanner("", window.rayka.Position.TOP, 0, 0);'>Show Banner at Top</button>
+			<button onclick='window.rayka.addBanner("", window.rayka.Position.BOTTOM, 0, 0);'>Show Banner at Bottom</button>
+			<button onclick='window.rayka.addBanner("", window.rayka.Position.XY, 0, random_position(0, 850));'>Show Banner at Random Position</button>
 			<button onclick="window.rayka.removeBanner();">Remove Banner</button>
             <button onclick='window.rayka.cachePopup("");'>cachePopup</button>
 			<button onclick="window.rayka.showPopup();">showPopup</button>

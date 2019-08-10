@@ -1,18 +1,54 @@
 module.exports = {
-	Position: {
-        TOP: 0,
-        BOTTOM: 1,
-		XY: 2
-    },
-    addBanner: function(position, x, y) {
+	Position: { TOP: 0, BOTTOM: 1, XY: 2 },
+    addBanner: function(zoneId, position, x, y) {
+        var self = this;
         cordova.exec(
-			null,
-			null,
+            function (result) {
+                if (typeof result == "string") {
+					if (result == "onBannerClick") {
+                        if (self.onBannerClick) {
+                            self.onBannerClick();
+                        }
+                    }
+                    if (result == "onBannerClose") {
+                        if (self.onBannerClose) {
+                            self.onBannerClose();
+                        }
+                    }
+                    if (result == "onBannerFail") {
+                        if (self.onBannerFail) {
+                            self.onBannerFail();
+                        }
+                    }
+                    if (result == "onBannerReady") {
+                        if (self.onBannerReady) {
+                            self.onBannerReady();
+                        }
+                    }
+                    if (result == "onBannerRequest") {
+                        if (self.onBannerRequest) {
+                            self.onBannerRequest();
+                        }
+                    }
+                    if (result == "onBannerShow") {
+                        if (self.onBannerShow) {
+                            self.onBannerShow();
+                        }
+                    }
+                }
+            },
+            null,
             'Rayka',
             'addBanner',
-            [ position, x, y ]
-        ); 
+            [ zoneId, position, x, y ]
+        );
     },
+    onBannerClick: null,
+    onBannerClose: null,
+    onBannerFail: null,
+    onBannerReady: null,
+    onBannerRequest: null,
+    onBannerShow: null,
     removeBanner: function() {
         cordova.exec(
 			null,
@@ -22,11 +58,12 @@ module.exports = {
             []
         ); 
     },
-    cachePopup: function(zoneId) {
+	cachePopup: function (zoneId) {
+        var self = this;
         cordova.exec(
-			function (result) {
+            function (result) {
                 if (typeof result == "string") {
-                    if (result == "onPopupClick") {
+					if (result == "onPopupClick") {
                         if (self.onPopupClick) {
                             self.onPopupClick();
                         }
@@ -58,12 +95,18 @@ module.exports = {
                     }
                 }
             },
-			null,
+            null,
             'Rayka',
             'cachePopup',
             [ zoneId ]
-        ); 
+        );
     },
+    onPopupClick: null,
+    onPopupClose: null,
+    onPopupFail: null,
+    onPopupReady: null,
+    onPopupRequest: null,
+    onPopupShow: null,
     showPopup: function() {
         cordova.exec(
 			null,
@@ -121,6 +164,13 @@ module.exports = {
             [ zoneId ]
         );
     },
+    onVideoClick: null,
+    onVideoFail: null,
+    onVideoReady: null,
+    onVideoRequest: null,
+    onVideoStart: null,
+    onVideoComplete: null,
+    onVideoNotComplete: null,
     showVideo: function () {
         cordova.exec(
             null,
@@ -129,18 +179,5 @@ module.exports = {
             'showVideo',
             []
         );
-    },
-    onPopupClick: null,
-    onPopupClose: null,
-    onPopupFail: null,
-    onPopupReady: null,
-    onPopupRequest: null,
-    onPopupShow: null,
-    onVideoClick: null,
-    onVideoFail: null,
-    onVideoReady: null,
-    onVideoRequest: null,
-    onVideoStart: null,
-    onVideoComplete: null,
-    onVideoNotComplete: null
+    }
 };

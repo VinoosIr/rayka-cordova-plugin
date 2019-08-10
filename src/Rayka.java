@@ -22,7 +22,6 @@ import android.widget.FrameLayout;
 
 public class Rayka extends CordovaPlugin {
 	private static final String LOG_TAG = "Rayka";
-	private static CallbackContext callbackContextKeepCallback = null;
 	private static Activity mActivity = null;
 	public CordovaInterface cordova = null;
 	private FrameLayout bannerLayout;
@@ -32,28 +31,29 @@ public class Rayka extends CordovaPlugin {
 	
 	@Override
 	public void initialize(CordovaInterface initCordova, CordovaWebView webView) {
-		 Log.e (LOG_TAG, "initialize");
-		 cordova = initCordova;
-		 super.initialize (cordova, webView);
+		Log.e (LOG_TAG, "initialize");
+		cordova = initCordova;
+		mActivity = cordova.getActivity();
+		super.initialize (cordova, webView);
 	}
 	
 	
 	@Override
 	public boolean execute(String action, JSONArray args, final CallbackContext CallbackContext) throws JSONException {
+		if (action.equals("addBanner")) {
+			addBanner(action, args, CallbackContext);
+			return true;
+		}
+		if (action.equals("removeBanner")) {
+			removeBanner();
+			return true;
+		}
 		if (action.equals("cachePopup")) {
 			cachePopup(action, args, CallbackContext);
 			return true;
 		}
 		if (action.equals("showPopup")) {
 			showPopup(action, args, CallbackContext);
-			return true;
-		}
-		if (action.equals("addBanner")) {
-			addBanner(action, args, CallbackContext);
-			return true;
-		}
-		if (action.equals("removeBanner")) {
-			removeBanner(action, args, CallbackContext);
 			return true;
 		}
 		if (action.equals("cacheVideo")) {
@@ -67,13 +67,76 @@ public class Rayka extends CordovaPlugin {
 	    return false;
 	}
 	
-	private void addBanner(String action, final JSONArray args, CallbackContext callbackContext) throws JSONException {
-		callbackContextKeepCallback = callbackContext;
+	private void addBanner(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
 		cordova.getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					_addBanner(args);
+					final String zoneId = args.getString(0);
+					final int position = args.getInt(1);
+					if (bannerLayout != null) {
+						removeBanner();
+					}
+					bannerLayout = new FrameLayout(mActivity);
+				    FrameLayout.LayoutParams fLayoutParams = new FrameLayout.LayoutParams(-2, -2);
+				    switch (position) {
+					    case POSITION_TOP:
+					    	fLayoutParams.gravity = Gravity.TOP;
+					    	break;
+					    case POSITION_BOTTOM:
+					    	fLayoutParams.gravity = Gravity.BOTTOM;
+					    case POSITION_XY:
+					    	fLayoutParams.leftMargin = args.getInt(2);
+					    	fLayoutParams.topMargin = args.getInt(3);
+				    }
+				    bannerLayout.setLayoutParams(fLayoutParams);
+				    ((ViewGroup) getParentGroup().getParent()).addView(bannerLayout, 1);
+				    Banner banner = new Banner(mActivity, zoneId);
+				    Raykaad.bannerSetListener(mActivity, new AdListener(){
+
+						@Override
+						public void onRequest() {
+							PluginResult pr = new PluginResult(PluginResult.Status.OK, "onBannerRequest");
+							pr.setKeepCallback(true);
+							callbackContext.sendPluginResult(pr);
+						}
+
+						@Override
+						public void onReady() {
+							PluginResult pr = new PluginResult(PluginResult.Status.OK, "onBannerReady");
+							pr.setKeepCallback(true);
+							callbackContext.sendPluginResult(pr);
+						}
+
+						@Override
+						public void onFail(String message) {
+							PluginResult pr = new PluginResult(PluginResult.Status.OK, "onBannerFail");
+							pr.setKeepCallback(true);
+							callbackContext.sendPluginResult(pr);
+						}
+
+						@Override
+						public void onShow() {
+							PluginResult pr = new PluginResult(PluginResult.Status.OK, "onBannerShow");
+							pr.setKeepCallback(true);
+							callbackContext.sendPluginResult(pr);
+						}
+
+						@Override
+						public void onClick() {
+							PluginResult pr = new PluginResult(PluginResult.Status.OK, "onBannerClick");
+							pr.setKeepCallback(true);
+							callbackContext.sendPluginResult(pr);
+						}
+
+						@Override
+						public void onClose() {
+							PluginResult pr = new PluginResult(PluginResult.Status.OK, "onBannerClose");
+							pr.setKeepCallback(true);
+							callbackContext.sendPluginResult(pr);
+						}
+					});
+				    bannerLayout.addView(banner);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -81,55 +144,23 @@ public class Rayka extends CordovaPlugin {
 		});
 	}
 	
-	private void _addBanner(JSONArray args) throws JSONException {
-	    mActivity = cordova.getActivity();
-		final int position = args.getInt(0);
-		if (bannerLayout != null) {
-			_removeBanner();
-		}
-		bannerLayout = new FrameLayout(mActivity);
-	    FrameLayout.LayoutParams fLayoutParams = new FrameLayout.LayoutParams(-2, -2);
-	    switch (position) {
-		    case POSITION_TOP:
-		    	fLayoutParams.gravity = Gravity.TOP;
-		    	break;
-		    case POSITION_BOTTOM:
-		    	fLayoutParams.gravity = Gravity.BOTTOM;
-		    case POSITION_XY:
-		    	fLayoutParams.leftMargin = args.getInt(1);
-		    	fLayoutParams.topMargin = args.getInt(2);
-	    }
-	    bannerLayout.setLayoutParams(fLayoutParams);
-	    ((ViewGroup) getParentGroup().getParent()).addView(bannerLayout, 1);
-	    Banner banner = new Banner(mActivity);
-	    bannerLayout.addView(banner);
-		callbackContextKeepCallback.success();
-	}
-
-	private void removeBanner(String action, final JSONArray args, CallbackContext callbackContext) throws JSONException {
-		callbackContextKeepCallback = callbackContext;
+	private void removeBanner(){
 		cordova.getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				_removeBanner();
+				if (bannerLayout == null)
+				      return;
+			    if (mActivity != null) {
+			    	mActivity.runOnUiThread(new Runnable() {
+				        public void run() {
+				        	ViewGroup viewGroup;
+			      		if (((viewGroup = getParentGroup()) != null) && ((viewGroup instanceof ViewGroup)) && (((ViewGroup)viewGroup.getParent()).getChildAt(1) != null))
+			      			((ViewGroup)viewGroup.getParent()).removeViewAt(1);
+				        }
+			    	});
+			    }
 			}
 		});
-	}
-	
-	private void _removeBanner() {
-		if (bannerLayout == null)
-		      return;
-	    if (mActivity != null) {
-	    	mActivity.runOnUiThread(new Runnable() {
-	        public void run() {
-	        	ViewGroup viewGroup;
-        		if (((viewGroup = getParentGroup()) != null) && ((viewGroup instanceof ViewGroup)) && (((ViewGroup)viewGroup.getParent()).getChildAt(1) != null))
-        			((ViewGroup)viewGroup.getParent()).removeViewAt(1);
-	        }
-	      });
-	      if (callbackContextKeepCallback != null)
-	    	  callbackContextKeepCallback.success();
-	    }
 	}
 	
 	private ViewGroup getParentGroup() {
@@ -145,167 +176,137 @@ public class Rayka extends CordovaPlugin {
 	    return null;
 	}
 
-	private void cachePopup(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-		callbackContextKeepCallback = callbackContext;
+	private void cachePopup(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
 		final String zoneId = args.getString(0);
 		cordova.getActivity().runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
-				_cachePopup(callbackContextKeepCallback, zoneId);
+			    Raykaad.popupSetListener(mActivity, new AdListener(){
+			    	@Override
+					public void onClick() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupClick");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onClose() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupClose");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onFail(String message) {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupFail");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onReady() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupReady");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onRequest() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupRequest");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onShow() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupShow");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+				});
+				Raykaad.cachePopup(mActivity, zoneId);
 			}
 		});
-	}
-	
-	private void _cachePopup(CallbackContext callbackContext, String zoneId) {
-	    mActivity = cordova.getActivity();
-	    Raykaad.popupSetListener(mActivity, new PopupListener());
-		Raykaad.cachePopup(mActivity, zoneId);
-	    callbackContextKeepCallback = callbackContext;
-	}
-	
-	class PopupListener implements AdListener {
-
-		@Override
-		public void onClick() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupClick");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onClose() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupClose");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onFail(String message) {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupFail");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onReady() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupReady");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onRequest() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupRequest");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onShow() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onPopupShow");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-		
 	}
 	
 	private void showPopup(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		cordova.getActivity().runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
-				_showPopup();
+				Raykaad.showPopup(mActivity);
 			}
 		});
 	}
-	
-	private void _showPopup() {
-	    mActivity = cordova.getActivity();
-		Raykaad.showPopup(mActivity);
-	}
-	
-	private void cacheVideo(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-		callbackContextKeepCallback = callbackContext;
+		
+	private void cacheVideo(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
 		final String zoneId = args.getString(0);
 		cordova.getActivity().runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
-				_cacheVideo(callbackContextKeepCallback, zoneId);
+				Raykaad.setVideoListener(new VideoAdListener(){
+
+					@Override
+					public void onClick() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoClick");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onFail(String message) {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoFail");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onReady() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoReady");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onRequest() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoRequest");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+
+					@Override
+					public void onStart() {
+						PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoStart");
+						pr.setKeepCallback(true);
+						callbackContext.sendPluginResult(pr);
+					}
+			    });
+			    Raykaad.setVideoResultListener(new VideoResult(){
+
+			    	@Override
+					public void onResult(boolean complete) {
+						if (complete) {
+							PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoComplete");
+							pr.setKeepCallback(true);
+							callbackContext.sendPluginResult(pr);
+						} else {
+							PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoNotComplete");
+							pr.setKeepCallback(true);
+							callbackContext.sendPluginResult(pr);
+						}
+					}
+				});
+				Raykaad.cacheVideo(mActivity, zoneId);
 			}
 		});
-	}
-	
-	private void _cacheVideo(CallbackContext callbackContext, String zoneId) {
-	    mActivity = cordova.getActivity();
-	    Raykaad.setVideoListener(new VideoListener());
-	    Raykaad.setVideoResultListener(new VideoResultListener());
-		Raykaad.cacheVideo(mActivity, zoneId);
-	    callbackContextKeepCallback = callbackContext;
-	}
-	
-	class VideoListener implements VideoAdListener {
-		public void onClick() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoClick");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onFail(String message) {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoFail");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onReady() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoReady");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onRequest() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoRequest");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-
-		@Override
-		public void onStart() {
-			PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoStart");
-			pr.setKeepCallback(true);
-			callbackContextKeepCallback.sendPluginResult(pr);
-		}
-	}
-	
-	class VideoResultListener implements VideoResult {
-
-		@Override
-		public void onResult(boolean complete) {
-			if (complete) {
-				PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoComplete");
-				pr.setKeepCallback(true);
-				callbackContextKeepCallback.sendPluginResult(pr);
-			} else {
-				PluginResult pr = new PluginResult(PluginResult.Status.OK, "onVideoNotComplete");
-				pr.setKeepCallback(true);
-				callbackContextKeepCallback.sendPluginResult(pr);
-			}
-		}
-		
+	    
 	}
 	
 	private void showVideo(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		cordova.getActivity().runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
-				_showVideo();
+				Raykaad.showVideo(mActivity);
 			}
 		});
-	}
-	
-	private void _showVideo() {
-	    mActivity = cordova.getActivity();
-		Raykaad.showVideo(mActivity);
 	}
 }
